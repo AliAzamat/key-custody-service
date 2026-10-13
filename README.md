@@ -78,12 +78,3 @@ The store uses `database/sql` with `?` placeholders and the schema in `store/sch
 | `store` | Logical keys and versions over `database/sql`; `Rotate` adds a version without deleting old ones |
 | `audit` | Append-only, hash-chained operation log |
 | `api` | HTTP handler for `POST /encrypt` with error-to-status mapping that never echoes key material |
-
-## Status and limitations
-
-The cryptographic core and authorization model are implemented; the service around them is partial.
-
-- **No `go.mod`, `main` package, or tests yet.** The packages build once the module is initialized (verified with Go 1.24), and an envelope round-trip plus AAD-mismatch rejection behave as described.
-- **Rotation is metadata only.** `store.Rotate` creates a new active version and retires the old one, but the version isn't yet used in encryption, the `KMS` has no `RotateKey` method, and there's no re-wrapping of existing envelopes.
-- **HTTP surface is minimal.** Only the `/encrypt` handler exists; there's no router, no decrypt or create-key handler, and authentication middleware is assumed to set the principal upstream.
-- **Audit log is in-memory.** As the threat model notes, tamper *detection* also requires publishing the chain head somewhere an attacker can't rewrite.
